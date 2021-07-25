@@ -1,6 +1,10 @@
 import React from 'react';
+import { connect } from "react-redux";
 import ImageGallery from 'react-image-gallery';
 
+import {
+  getCarouselConfigAction
+} from "../../redux/actions/carousel-action";
 
 const PREFIX_URL = 'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/';
 
@@ -57,6 +61,10 @@ class Carousel extends React.Component {
         description: 'Custom class for slides & thumbnails'
       },
     ].concat(this._getStaticImages());
+  }
+
+  componentDidMount() {
+    this.props.getCarouselConfig();
   }
 
   _onImageClick(event) {
@@ -343,4 +351,19 @@ class Carousel extends React.Component {
   }
 }
 
-export default Carousel;
+export const mapStateToProps = store => {
+  return {
+    carouselConfig: store.CarouselReducer.carouselConfig
+  };
+};
+
+export const mapDispatchToProps = dispatch => {
+  return {
+    getCarouselConfig: data => {
+      dispatch(getCarouselConfigAction(data));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Carousel);
+
