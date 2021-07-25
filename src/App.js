@@ -1,9 +1,14 @@
+import { Provider } from "react-redux";
+
+import configStore from "./redux/store/store";
 import Carousel from './containers/carousel';
 import "./styles/index.css";
 
 function App() {
   return (
-    <Carousel />
+    <Provider store={configStore}>
+      <Carousel />
+    </Provider>
   );
 }
 
