@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from "react-redux";
+import { List } from "immutable";
 import ImageGallery from 'react-image-gallery';
 
-import {
-  getCarouselConfigAction
-} from "../../redux/actions/carousel-action";
+import * as ApplicationConstants from "../../constants/application";
+
+import { getCarouselConfigAction } from "../../redux/actions/carousel-action";
 
 const PREFIX_URL = 'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/';
 
@@ -12,24 +13,7 @@ class Carousel extends React.Component {
 
   constructor() {
     super();
-    this.state = {
-      showIndex: false,
-      showBullets: true,
-      infinite: true,
-      showThumbnails: true,
-      showFullscreenButton: true,
-      showGalleryFullscreenButton: true,
-      showPlayButton: true,
-      showGalleryPlayButton: true,
-      showNav: true,
-      isRTL: false,
-      slideDuration: 450,
-      slideInterval: 2000,
-      slideOnThumbnailOver: false,
-      thumbnailPosition: 'bottom',
-      showVideo: {},
-      useWindowKeyDown: true,
-    };
+    this.state = this.transformIncomingProps();
 
     this.images = [
       {
@@ -63,50 +47,107 @@ class Carousel extends React.Component {
     ].concat(this._getStaticImages());
   }
 
+  transformIncomingProps = props => {
+    const state = {
+      showIndex: false,
+      showBullets: true,
+      infinite: true,
+      showThumbnails: true,
+      showFullscreenButton: true,
+      showGalleryFullscreenButton: true,
+      showPlayButton: true,
+      showGalleryPlayButton: true,
+      showNav: true,
+      isRTL: false,
+      slideDuration: 450,
+      slideInterval: 2000,
+      slideOnThumbnailOver: false,
+      thumbnailPosition: 'bottom',
+      showVideo: {},
+      useWindowKeyDown: true,
+      images: []
+    };
+
+    return state;
+  };
+
+  updateState = (key, value) => {
+    this.setState({
+      [key]: value
+    });
+  };
+
   componentDidMount() {
     this.props.getCarouselConfig();
   }
 
-  _onImageClick(event) {
+  componentDidUpdate(prevProps, prevState) {
+    this.checkCarouselConfig(prevProps);
+  }
+
+  //ComponentDidUpdate check
+  checkCarouselConfig = (prevProps) => {
+    if(prevProps.carouselConfig !== this.props.carouselConfig) {
+      const carouselConfigInit = this.props.carouselConfig.get(ApplicationConstants.PROP_INITIALIZED, false);
+      const carouselConfigData = this.props.carouselConfig.getIn([ApplicationConstants.PROP_DATA, "images"], List([]));
+
+      if(carouselConfigInit) {
+        const convertDateToJS = carouselConfigData.toJS();
+        const newImageStateArr = [];
+
+        convertDateToJS.map(image => {
+          const newImageObject = image['isVideo'] && Object.assign({}, image, {'renderItem': this._renderVideo.bind(image)});
+  
+          return newImageStateArr.push(newImageObject ?? image);
+        })
+
+        this.updateState('images', newImageStateArr);
+      }
+    }
+  }
+
+
+  //private functions
+  _onImageClick = (event) => {
     console.debug('clicked on image', event.target, 'at index', this._imageGallery.getCurrentIndex());
   }
 
-  _onImageLoad(event) {
+  _onImageLoad = (event) => {
     console.debug('loaded image', event.target.src);
   }
 
-  _onSlide(index) {
+  _onSlide = (index) => {
     this._resetVideo();
     console.debug('slid to index', index);
   }
 
-  _onPause(index) {
+  _onPause = (index) => {
     console.debug('paused on index', index);
   }
 
-  _onScreenChange(fullScreenElement) {
+  _onScreenChange = (fullScreenElement) => {
     console.debug('isFullScreen?', !!fullScreenElement);
   }
 
-  _onPlay(index) {
+  _onPlay = (index) => {
     console.debug('playing from index', index);
   }
 
-  _handleInputChange(state, event) {
+  _handleInputChange = (state, event) => {
     if (event.target.value > 0) {
       this.setState({[state]: event.target.value});
     }
   }
 
-  _handleCheckboxChange(state, event) {
+  _handleCheckboxChange = (state, event) => {
     this.setState({[state]: event.target.checked});
   }
 
-  _handleThumbnailPositionChange(event) {
+  _handleThumbnailPositionChange = (event) => {
     this.setState({thumbnailPosition: event.target.value});
   }
 
-  _getStaticImages() {
+  _getStaticImages = () => {
     let images = [];
     for (let i = 2; i < 12; i++) {
       images.push({
@@ -118,7 +159,7 @@ class Carousel extends React.Component {
     return images;
   }
 
-  _resetVideo() {
+  _resetVideo = () => {
     this.setState({showVideo: {}});
 
     if (this.state.showPlayButton) {
@@ -130,7 +171,7 @@ class Carousel extends React.Component {
     }
   }
 
-  _toggleShowVideo(url) {
+  _toggleShowVideo = (url) => {
     this.state.showVideo[url] = !Boolean(this.state.showVideo[url]);
     this.setState({
       showVideo: this.state.showVideo
@@ -147,7 +188,7 @@ class Carousel extends React.Component {
     }
   }
 
-  _renderVideo(item) {
+  _renderVideo = (item) => {
     return (
       <div>
         {
@@ -192,7 +233,7 @@ class Carousel extends React.Component {
       <section className='app'>
         <ImageGallery
           ref={i => this._imageGallery = i}
-          items={this.images}
+          items={this.state.images}
           lazyLoad={false}
           onClick={this._onImageClick.bind(this)}
           onImageLoad={this._onImageLoad}
