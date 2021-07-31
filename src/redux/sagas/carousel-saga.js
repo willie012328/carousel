@@ -2,7 +2,7 @@ import { takeLatest, put, call } from "redux-saga/effects";
 
 import * as Actions from "../../redux/actions/action-types";
 
-import service from "../../utils/service";
+import service from "../../modules/service";
 
 const repoUrl =
   "https://raw.githubusercontent.com/willie012328/carousel-content-source/main/customDef/config.json";

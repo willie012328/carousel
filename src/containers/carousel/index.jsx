@@ -96,7 +96,15 @@ class Carousel extends React.Component {
         const newImageStateArr = [];
 
         convertDateToJS.map(image => {
-          const newImageObject = image['isVideo'] && Object.assign({}, image, {'renderItem': this._renderVideo.bind(image)});
+          let newImageObject;
+
+          if(image['isVideo']) {
+            newImageObject = this.handleIsVideoObject(image);
+          }
+
+          if(image['isImageInLocal']) {
+            newImageObject = this.handleLocalImage(image);
+          }
   
           return newImageStateArr.push(newImageObject ?? image);
         })
@@ -104,6 +112,24 @@ class Carousel extends React.Component {
         this.updateState('images', newImageStateArr);
       }
     }
+  }
+
+  handleIsVideoObject = (imageObj) => {
+    return imageObj['isVideo'] && Object.assign({}, imageObj, {'renderItem': this._renderVideo.bind(imageObj)});
+  }
+
+  handleLocalImage = (imageObj) => {
+    const indexStart = imageObj['indexStart'] ?? 0;
+    const indexEnd = imageObj['indexEnd'] ?? 0;
+    let localImageArr = [];
+
+    for(let i = indexStart; i <= indexEnd; i++) {
+      localImageArr.push({
+        original: `{SOURCE_URL}${i}.jpg`,
+        thumbnail:`{SOURCE_URL}${i}.jpg`
+      })
+    }
+    return localImageArr;
   }
 
 
@@ -234,7 +260,6 @@ class Carousel extends React.Component {
         <ImageGallery
           ref={i => this._imageGallery = i}
           items={this.state.images}
-          lazyLoad={false}
           onClick={this._onImageClick.bind(this)}
           onImageLoad={this._onImageLoad}
           onSlide={this._onSlide.bind(this)}
