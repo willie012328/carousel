@@ -1,5 +1,6 @@
 /* From package */
-@import '~react-image-gallery/styles/css/image-gallery.css';
+@import "~react-image-gallery/styles/css/image-gallery.css";
 
 /* Custom styles */
-@import 'carousel.css';
+@import "carousel.css";
+@import "utilities.css";
