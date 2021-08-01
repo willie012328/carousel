@@ -8,8 +8,8 @@ import Carousel from "./containers/carousel";
 export function Routes(props) {
   return (
     <Switch>
-      <Route exact path='/' render={LandingPage} />
-      <Route exact path='/:carouselRepo' render={Carousel} />
+      <Route exact path='/' component={LandingPage} />
+      <Route exact path='/:carouselRepo' component={Carousel} />
       <Redirect to='/' />
     </Switch>
   );
