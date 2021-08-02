@@ -1,5 +1,6 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { connect } from "react-redux";
+import { Link } from 'react-router-dom';
 import { List } from "immutable";
 import ImageGallery from "react-image-gallery";
 
@@ -8,6 +9,7 @@ import * as ApplicationConstants from "../../constants/application";
 import { getCarouselConfigAction } from "../../redux/actions/carousel-action";
 
 import ErrorPage from "../error";
+import Spinner from "../spinner";
 
 const PREFIX_URL = 'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/';
 
@@ -135,6 +137,10 @@ class Carousel extends React.Component {
       })
     }
     return localImageArr;
+  }
+
+  renderSpinner = () => {
+    return <Spinner />
   }
 
   renderErrorPage = () => {
@@ -266,8 +272,13 @@ class Carousel extends React.Component {
   }
 
   render() {
+    const isFetching = this.props.carouselConfig.get(ApplicationConstants.PROP_FETCHING, false);
     const isError = this.props.carouselConfig.get(ApplicationConstants.PROP_ERROR, false);
 
+    if(isFetching) {
+      return this.renderSpinner();
+    }
+    
     if(isError) {
       return this.renderErrorPage();
     }
@@ -302,7 +313,7 @@ class Carousel extends React.Component {
         <div className='app-sandbox'>
 
           <div className='app-sandbox-content'>
-            <h2 className='app-header'>Settings</h2>
+            <h2 className='app-header'>Settings <Link className="button-like-link" to="/" replace>Back to Landing Page</Link></h2>
 
             <ul className='app-buttons'>
               <li>
