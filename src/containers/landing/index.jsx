@@ -40,7 +40,7 @@ class LandingPage extends React.Component {
             <h2 className='app-header'>Enter Source Repository Name</h2>
   
             <div className='margin-auto'>
-              <span className='landing-interval-label'>{`${RepoOwner.REPO_OWNER}`}</span>
+              <label className='landing-interval-label'>{`${RepoOwner.REPO_OWNER}`}</label>
               <input
                 className='landing-interval-input'
                 type='text'
