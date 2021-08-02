@@ -7,9 +7,6 @@ import * as Config from "../../config/config.json";
 import service from "../../modules/service";
 import { generateURL } from "../../modules/utilities";
 
-const repoUrl =
-  "https://raw.githubusercontent.com/willie012328/carousel-content-source/main/customDef/config.json";
-
 // Get carousel content config
 export function* watchCarouselConfig() {
   yield takeLatest(Actions.GET_CAROUSEL_CONFIG_INIT, callCarouselConfig);
