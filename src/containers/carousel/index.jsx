@@ -80,7 +80,10 @@ class Carousel extends React.Component {
   };
 
   componentDidMount() {
-    this.props.getCarouselConfig();
+    const { match } = this.props;
+    const carouselRepo = match?.params?.carouselRepo ?? '';
+    
+    this.props.getCarouselConfig({carouselRepo});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -135,7 +138,10 @@ class Carousel extends React.Component {
   }
 
   renderErrorPage = () => {
-    return <ErrorPage />
+    const errorStatus = this.props.carouselConfig.get(ApplicationConstants.PROP_STATUS, 0);
+    const errorData = this.props.carouselConfig.getIn([ApplicationConstants.PROP_DATA, "data"], '');
+
+    return <ErrorPage status={errorStatus} data={errorData}/>
   }
 
 

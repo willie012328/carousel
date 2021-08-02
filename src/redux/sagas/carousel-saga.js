@@ -2,7 +2,10 @@ import { takeLatest, put, call } from "redux-saga/effects";
 
 import * as Actions from "../../redux/actions/action-types";
 
+import * as Config from "../../config/config.json";
+
 import service from "../../modules/service";
+import { generateURL } from "../../modules/utilities";
 
 const repoUrl =
   "https://raw.githubusercontent.com/willie012328/carousel-content-source/main/customDef/config.json";
@@ -17,7 +20,7 @@ export function* callCarouselConfig(action) {
 }
 
 export function* fetchCarouselConfig(data) {
-  const url = repoUrl;
+  const url = generateURL(Config.source_URL, data);
 
   try {
     const response = yield call(service.api, "get", url);
