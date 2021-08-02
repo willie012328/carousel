@@ -17,6 +17,10 @@
   border-left: none;
 }
 
+.landing-interval-input:focus-visible {
+  outline: none;
+}
+
 .landing-interval-button {
   cursor: pointer;
   background-color: #ccc;
