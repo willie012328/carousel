@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import { List } from "immutable";
-import ImageGallery from 'react-image-gallery';
+import ImageGallery from "react-image-gallery";
 
 import * as ApplicationConstants from "../../constants/application";
 
 import { getCarouselConfigAction } from "../../redux/actions/carousel-action";
+
+import ErrorPage from "../error";
 
 const PREFIX_URL = 'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/';
 
@@ -132,6 +134,10 @@ class Carousel extends React.Component {
     return localImageArr;
   }
 
+  renderErrorPage = () => {
+    return <ErrorPage />
+  }
+
 
   //private functions
   _onImageClick = (event) => {
@@ -254,8 +260,13 @@ class Carousel extends React.Component {
   }
 
   render() {
-    return (
+    const isError = this.props.carouselConfig.get(ApplicationConstants.PROP_ERROR, false);
 
+    if(isError) {
+      return this.renderErrorPage();
+    }
+
+    return (
       <section className='app'>
         <ImageGallery
           ref={i => this._imageGallery = i}
