@@ -2,5 +2,6 @@
 @import "~react-image-gallery/styles/css/image-gallery.css";
 
 /* Custom styles */
-@import "carousel.css";
 @import "utilities.css";
+@import "landing.css";
+@import "carousel.css";
