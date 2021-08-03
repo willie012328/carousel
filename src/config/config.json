@@ -1,3 +1,4 @@
 {
-  "source_URL": "https://raw.githubusercontent.com/willie012328/carousel-content-source/main/{carouselRepo}/config.json"
+  "source_URL": "https://raw.githubusercontent.com/willie012328/carousel-content-source/main/{carouselRepo}",
+  "source_config_file": "config.json"
 }

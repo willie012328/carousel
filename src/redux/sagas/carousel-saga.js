@@ -17,7 +17,8 @@ export function* callCarouselConfig(action) {
 }
 
 export function* fetchCarouselConfig(data) {
-  const url = generateURL(Config.source_URL, data);
+  const formEndPoint = `${Config.source_URL}/${Config.source_config_file}`;
+  const url = generateURL(formEndPoint, data);
 
   try {
     const response = yield call(service.api, "get", url);

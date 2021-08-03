@@ -4,51 +4,22 @@ import { Link } from 'react-router-dom';
 import { List } from "immutable";
 import ImageGallery from "react-image-gallery";
 
+import * as Config from "../../config/config.json";
+
 import * as ApplicationConstants from "../../constants/application";
+
+import { generateURL } from "../../modules/utilities";
 
 import { getCarouselConfigAction } from "../../redux/actions/carousel-action";
 
 import ErrorPage from "../error";
 import Spinner from "../spinner";
 
-const PREFIX_URL = 'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/';
-
 class Carousel extends React.Component {
 
   constructor() {
     super();
     this.state = this.transformIncomingProps();
-
-    this.images = [
-      {
-        thumbnail: `${PREFIX_URL}4v.jpg`,
-        original: `${PREFIX_URL}4v.jpg`,
-        embedUrl: 'https://www.youtube.com/embed/4pSzhZ76GdM?autoplay=1&showinfo=0',
-        description: 'Render custom slides within the gallery',
-        renderItem: this._renderVideo.bind(this)
-      },
-      {
-        original: `${PREFIX_URL}image_set_default.jpg`,
-        thumbnail: `${PREFIX_URL}image_set_thumb.jpg`,
-        imageSet: [
-          {
-            srcSet: `${PREFIX_URL}image_set_cropped.jpg`,
-            media : '(max-width: 1280px)',
-          },
-          {
-            srcSet: `${PREFIX_URL}image_set_default.jpg`,
-            media : '(min-width: 1280px)',
-          }
-        ]
-      },
-      {
-        original: `${PREFIX_URL}1.jpg`,
-        thumbnail: `${PREFIX_URL}1t.jpg`,
-        originalClass: 'featured-slide',
-        thumbnailClass: 'featured-thumb',
-        description: 'Custom class for slides & thumbnails'
-      },
-    ].concat(this._getStaticImages());
   }
 
   transformIncomingProps = props => {
@@ -103,17 +74,19 @@ class Carousel extends React.Component {
         const newImageStateArr = [];
 
         convertDateToJS.map(image => {
-          let newImageObject;
+          let newImageSet;
 
           if(image['isVideo']) {
-            newImageObject = this.handleIsVideoObject(image);
+            newImageSet = this.handleIsVideoObject(image);
+            return newImageStateArr.push(newImageSet ?? image);
           }
 
           if(image['isImageInLocal']) {
-            newImageObject = this.handleLocalImage(image);
+            newImageSet = this.handleLocalImage(image);
+            return newImageStateArr.push(...newImageSet ?? image);
           }
-  
-          return newImageStateArr.push(newImageObject ?? image);
+
+          return newImageStateArr.push(image);
         })
 
         this.updateState('images', newImageStateArr);
@@ -126,14 +99,17 @@ class Carousel extends React.Component {
   }
 
   handleLocalImage = (imageObj) => {
+    const carouselRepo = this.props.carouselConfig.getIn([ApplicationConstants.PROP_OTHER, 'carouselRepo'], '');
+    const url = generateURL(`${Config.source_URL}/`,{carouselRepo});
+
     const indexStart = imageObj['indexStart'] ?? 0;
     const indexEnd = imageObj['indexEnd'] ?? 0;
     let localImageArr = [];
 
     for(let i = indexStart; i <= indexEnd; i++) {
       localImageArr.push({
-        original: `{SOURCE_URL}${i}.jpg`,
-        thumbnail:`{SOURCE_URL}${i}.jpg`
+        original: `${url}${i}.jpg`,
+        thumbnail:`${url}${i}.jpg`
       })
     }
     return localImageArr;
@@ -191,18 +167,6 @@ class Carousel extends React.Component {
     this.setState({thumbnailPosition: event.target.value});
   }
 
-  _getStaticImages = () => {
-    let images = [];
-    for (let i = 2; i < 12; i++) {
-      images.push({
-        original: `${PREFIX_URL}${i}.jpg`,
-        thumbnail:`${PREFIX_URL}${i}t.jpg`
-      });
-    }
-
-    return images;
-  }
-
   _resetVideo = () => {
     this.setState({showVideo: {}});
 
@@ -238,14 +202,15 @@ class Carousel extends React.Component {
         {
           this.state.showVideo[item.embedUrl] ?
             <div className='video-wrapper'>
-                <a
+                <button
                   className='close-video'
                   onClick={this._toggleShowVideo.bind(this, item.embedUrl)}
                 >
-                </a>
+                </button>
                 <iframe
                   width='560'
                   height='315'
+                  title={item.embedUrl}
                   src={item.embedUrl}
                   frameBorder='0'
                   allowFullScreen
@@ -255,7 +220,7 @@ class Carousel extends React.Component {
           :
             <a onClick={this._toggleShowVideo.bind(this, item.embedUrl)}>
               <div className='play-button'></div>
-              <img className='image-gallery-image' src={item.original} />
+              <img className='image-gallery-image' src={item.original} alt="Video thumbnail"/>
               {
                 item.description &&
                   <span
